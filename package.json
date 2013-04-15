@@ -1,9 +1,10 @@
 {
     "name": "bplustree",
-    "descrtiption": "A B+ tree implementation in JavaScript.",
+    "description": "A B+ tree implementation in JavaScript.",
     "version": "0.1.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "main": "BPlusTree.js",
+    "keywords": ["tree", "btree", "b-tree", "data structure"],
     "dependencies": {},
     "devDependencies": {},
     "engines": {

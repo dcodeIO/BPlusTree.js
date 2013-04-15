@@ -40,8 +40,9 @@
     }
     
     var Node = function (options) {
-        this.order = 100;
-        this.mergeThreshold = 40;
+        options = options || {};
+        this.order = options.order || 100;
+        this.mergeThreshold = options.mergeThreshold || 40;
         this.data = [];
     };
     
@@ -82,8 +83,6 @@
     var InternalNode = function (options) {
         Node.call(this, options);
         this.data = options.data;
-        this.mergeThreshold = options.mergeThreshold;
-        this.order = options.order;
         this.leftPeer = options.leftPeer;
         this.rightPeer = options.rightPeer;
     };
@@ -100,18 +99,15 @@
             mid = left + Math.floor((right - left) / 2);
             if (data[mid].key < key) {
                 left = mid + 1;
-            }
-            else if (data[mid].key > key) {
+            } else if (data[mid].key > key) {
                 right = mid;
-            }
-            else {
+            } else {
                 found = true;
             }
         } while (left < right && !found);
         if (found) {
             return mid;
-        }
-        else {
+        } else {
             return right;
         }
     };
@@ -122,8 +118,7 @@
         var child;
         if (element.key <= key) {
             child = element.right;
-        }
-        else {
+        } else {
             child = element.left;
         }
         return child;
@@ -421,8 +416,6 @@
     var LeafNode = function (options) {
         Node.call(this, options);
         this.data = options.data;
-        this.mergeThreshold = options.mergeThreshold;
-        this.order = options.order;
         this.leftPeer = options.leftPeer;
         this.rightPeer = options.rightPeer;
     };
@@ -450,8 +443,7 @@
         } while (left !== right && !found);
         if (found) {
             return mid;
-        }
-        else {
+        } else {
             return left;
         }
     };
@@ -464,25 +456,20 @@
                 key: key,
                 value: value
             });
-        }
-        else if (element.key === key) {
+        } else if (element.key === key) {
             if (clobber) {
                 element.value = value;
             }
             else {
                 return [element.value];
             }
-        }
-        /*
-         * This condition may never obtain, given the way findIndex is written
-         */
-        else if (element.key < key) {
+        // This condition may never occur, given the way findIndex is written
+        } else if (element.key < key) {
             this.data.splice(index + 1, 0, {
                 key: key,
                 value: value
             });
-        }
-        else {
+        } else {
             this.data.splice(index, 0, {
                 key: key,
                 value: value
@@ -518,18 +505,17 @@
         }
         return [leftNode, this.data[splitIndex].key, rightNode];
     };
+    
     LeafNode.prototype.remove = function (key, leftMergeOption, rightMergeOption) {
         var index = this.findIndex(key);
         var element = this.data[index];
         if (index < this.data.length && element.key === key) {
             this.data.splice(index, 1);
             return [element.value].concat(this.merge(leftMergeOption, rightMergeOption));
-        }
-        else {
+        } else {
             return [undefined];
         }
     };
-    
     
     LeafNode.prototype.merge = function (leftMergeOption, rightMergeOption) {
         if (this.data.length > this.mergeThreshold) {
@@ -561,16 +547,14 @@
             retval[1] = leftMergeOption;
             retval[2] = this.data[0].key;
             retval[3] = this;
-        }
-        else if (rightSurplus > leftSurplus) {
+        } else if (rightSurplus > leftSurplus) {
             var rightSurplusData = rightMergeOption.getLeftSurplusData();
             this.data = this.data.concat(rightSurplusData);
             retval[0] = 1;
             retval[1] = this;
             retval[2] = rightMergeOption.getData()[0].key;
             retval[3] = rightMergeOption;
-        }
-        else {
+        } else {
             var mergedLeafNode;
             if (!isDefined(leftData)) {
                 mergedLeafNode = new LeafNode({
@@ -677,6 +661,7 @@
         }
         return range;
     };
+    
     LeafNode.prototype.toString = function (indent) {
         return indent + "[" + this.data.map(function (element) {
             return element.key;
@@ -684,9 +669,9 @@
     };
     
     var Tree = function (options) {
-        options = options || { order: 100, mergeThreshold: 40 };
-        this.order = options.order;
-        this.mergeThreshold = options.mergeThreshold;
+        options = options || {};
+        this.order = options.order || 100;
+        this.mergeThreshold = options.mergeThreshold || 40;
         this.root = new LeafNode({
             order: this.order,
             mergeThreshold: this.mergeThreshold,
@@ -697,7 +682,6 @@
     Tree.prototype.toString = function () {
         return this.root.toString("");
     };
-    
     
     Tree.prototype.insert = function (key, value, clobber) {
         var newNodes = this.root.insert(key, value, clobber);
@@ -731,10 +715,12 @@
     Tree.prototype.find = function (key) {
         return this.root.find(key);
     };
+    
     Tree.prototype.range = function (start, end) {
         return this.root.range(start, end);
     };
     
+    // Expose all types on top
     Tree.Node = Node;
     Tree.InternalNode = InternalNode;
     Tree.LeafNode = LeafNode;
@@ -743,12 +729,12 @@
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
         module["exports"] = Tree;
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
-        define("BTree", [], function() { return Tree; });
+        define("BPlusTree", [], function() { return Tree; });
     } else { // Shim
         if (!global["dcodeIO"]) {
             global["dcodeIO"] = {};
         }
-        global["dcodeIO"]["BTree"] = Tree;
+        global["dcodeIO"]["BPlusTree"] = Tree;
     }
 
 })(this);
