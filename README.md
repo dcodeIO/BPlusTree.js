@@ -1,7 +1,10 @@
 BPlusTree.js - A B+ tree implementation in JavaScript.
 ======================================================
 Based on Santanu Basu's [BPlusJS](https://github.com/santanubasu/BPlusJS), modified for stand-alone use. This is mostly
-just a port of the original code, so I cannot guarantee for anything. I appreciate any pull requests.
+just a port of the original code, so I cannot guarantee for anything.
+
+If you are looking for a super-lean B-tree, you might want to try [nodebase-btree](https://github.com/dcodeIO/nodebase-btree)
+instead.
 
 Provides
 --------
